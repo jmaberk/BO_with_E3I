@@ -23,7 +23,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from prada_bayes_opt import visualization
+#from prada_bayes_opt import visualization
 from prada_bayes_opt import auxiliary_functions
 from prada_bayes_opt.utility import export_results
 import matplotlib

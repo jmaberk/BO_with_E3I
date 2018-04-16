@@ -27,22 +27,22 @@ from prada_gaussian_process import PradaGaussianProcess
 #from plot_thompson_samples import printThompson
        
 def run_experiment(bo,gp_params,yoptimal=0,n_init=3,NN=10):
-        """
-        Control loop that runs the BO method for the given function
+    """
+    Control loop that runs the BO method for the given function
 
-        Input parameters
-        ----------
-        bo: The Bayesian Optimization object
-        gp_params: parameter for Gaussian Process
-        yoptimal: Not used
-        n_init: Number of initial points
-        NN: Number of iterations. T in the paper
+    Input parameters
+    ----------
+    bo: The Bayesian Optimization object
+    gp_params: parameter for Gaussian Process
+    yoptimal: Not used
+    n_init: Number of initial points
+    NN: Number of iterations. T in the paper
 
-        Returns
-        -------
-        fxoptimal: The y values at each iterations
-        elapsed_time: The duration of the experiment
-        """
+    Returns
+    -------
+    fxoptimal: The y values at each iterations
+    elapsed_time: The duration of the experiment
+    """
     # create an empty object for BO
     
     start_time = time.time()
@@ -64,26 +64,26 @@ def run_experiment(bo,gp_params,yoptimal=0,n_init=3,NN=10):
     return fxoptimal, elapsed_time
             
 def yBest_Iteration(YY,BatchSzArray,IsPradaBO=0,Y_optimal=0,step=3):
-            """
-        Used for finding the
+    """
+    Used for finding the
 
-        Input parameters
-        ----------
-        bo: The Bayesian Optimization object
-        gp_params: parameter for Gaussian Process
-        yoptimal: Not used
-        n_init: Number of initial points
-        NN: Number of iterations. T in the paper
+    Input parameters
+    ----------
+    bo: The Bayesian Optimization object
+    gp_params: parameter for Gaussian Process
+    yoptimal: Not used
+    n_init: Number of initial points
+    NN: Number of iterations. T in the paper
 
-        Returns
-        -------
-        mean_TT: The mean optimal y values at each iterations over all
-        experiments
-        std_TT:The sdv of the optimal y values at each iterations over all
-        experiments
-        mean_cum_TT: not used
-        std_cum_TT: not used
-        """
+    Returns
+    -------
+    mean_TT: The mean optimal y values at each iterations over all
+    experiments
+    std_TT:The sdv of the optimal y values at each iterations over all
+    experiments
+    mean_cum_TT: not used
+    std_cum_TT: not used
+    """
     nRepeat=len(YY)
     YY=np.asarray(YY)
     YY=np.vstack(YY.T)

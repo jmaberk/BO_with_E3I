@@ -1,13 +1,10 @@
 '''
-Name: bayesianOptimizationMaster.py
+Name: example.py
 Authors: Julian Berk and Vu Nguyen
 Publication date:16/04/2018
 Inputs:None
 Outputs: Pickle files and plots containing the results from experiments run
-Description: The master file for code used to generate the results for the
-paper Exploration Enhanced Expected Improvement for Bayesian Optimization.
-Most aspects of the algorithm can be altered from this file. See comments for
-more details
+Description: Will run a quick example of E3I and 
 '''
 ###############################################################################
 import sys
@@ -17,9 +14,9 @@ import numpy as np
 from prada_bayes_opt import auxiliary_functions
 #from my_plot_gp import run_experiment
 from prada_bayes_opt import functions
-from prada_bayes_opt import real_experiment_function
 from prada_bayes_opt.utility import export_results
 import plot_results
+from print_two_peak_gaussian import plot_two_peak_gaussian
 import pickle
 import random
 import time
@@ -36,53 +33,7 @@ in your system for the code to work.
 #pickle_location='..\..\..'
 pickle_location="D:\OneDrive\Documents\PhD\Code\Bayesian\BO_with_E3I\pickleStorage"
 ###############################################################################
-'''
-Here the user can choose which functions to optimize. Just un-comment the 
-desired functions and set the desired dimensions with the dim parameter
-in supported functions
-'''
-###############################################################################
-myfunction_list=[]
-myfunction_list.append(functions.doubleGaussian(dim=2))
-#myfunction_list.append(functions.gaussian(dim=8))
-#myfunction_list.append(functions.mixture(peaks=3))
-#myfunction_list.append(functions.beale())
-#myfunction_list.append(functions.forrester())
-#myfunction_list.append(functions.rosenbrock())
-#myfunction_list.append(functions.eggholder())
-#myfunction_list.append(functions.franke())
-#myfunction_list.append(functions.shubert())
-#myfunction_list.append(functions.schwefel(dim=4))
-#myfunction_list.append(functions.griewank(dim=3))
-#myfunction_list.append(functions.levy(dim=5))
-#myfunction_list.append(functions.branin())
-#myfunction_list.append(functions.dropwave())
-#myfunction_list.append(functions.sixhumpcamel())
-#myfunction_list.append(functions.hartman_3d())
-#myfunction_list.append(functions.ackley(input_dim=5))
-#myfunction_list.append(functions.alpine1(input_dim=5))
-#myfunction_list.append(functions.alpine2(input_dim=5))
-#myfunction_list.append(functions.hartman_6d())
-#myfunction_list.append(functions.alpine2(input_dim=10))
-#myfunction_list.append(functions.gSobol(a=np.array([1,1,1,1,1,1,1,1,1,1])))
-#myfunction_list.append(functions.gSobol(a=np.array([1,1,1,1,1,1,1,1,1,1,1,1])))
-#myfunction_list.append(functions.gSobol(a=np.array([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])))
-#myfunction_list.append(real_experiment_function.SVR_function())
-#myfunction_list.append(real_experiment_function.AlloyCooking_Profiling_3Steps())
-#myfunction_list.append(real_experiment_function.Robot_BipedWalker())
-#myfunction_list.append(real_experiment_function.DeepLearning_MLP_MNIST())
-#myfunction_list.append(real_experiment_function.BayesNonMultilabelClassification())
-#myfunction_list.append(real_experiment_function.BayesNonMultilabelClassificationEnron())
 
-    
-###############################################################################
-'''
-Here the user can choose which acquisition functions will be used. To select
-an acquisition function, un-comment the "acq_type_list.append(temp)" after its
-name. If you do not have any pickle files for the method and function, you will
-also need to comment out the relevent section in plot_results.py.
-'''
-###############################################################################
 acq_type_list=[]
 
 temp={}
@@ -104,13 +55,10 @@ temp['zeta']=0.01
 acq_type_list.append(temp)
 
 mybatch_type_list={'Single'}
-
+plot_two_peak_gaussian()
 ###############################################################################
 '''
-#1 seed is used along with the experiment number as a seed to randomly generate
-the initial points. Setting this as a constant will allow results to be
-reproduced while making it random will let each set of runs use a different
-set of initial points.
+#1 The dimension of the two peak Gaussian mixture that will be optimized
 #2 num_initial_points controls the number of random sampled points each 
 experiment will start with.
 #3 max_iterations controls the number of iterations of Bayesian optimization
@@ -124,7 +72,10 @@ lengthscale adjustement will be made
 '''
 ###############################################################################
 
-#seed=np.random.randint(1,100) #1
+D=1 #1
+myfunction_list=[]
+myfunction_list.append(functions.doubleGaussian(dim=D))
+
 seed=1
 print("Seed of {} used".format(seed))
 
