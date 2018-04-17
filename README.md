@@ -12,12 +12,12 @@ The real world experiments require matlab engine (https://au.mathworks.com/help/
 We used the code on a windows 10 machine with matlab R2015b and a Theano-based Keras.
 
 ## Previous work
-Some code, including the real-world functions, are taken from previous works by Vu et al. These can be found here:https://github.com/ntienvu/ICDM2017_FBO and here:https://github.com/ntienvu/ICDM2016_B3O
+Some code, including the real-world functions, are taken from previous works by Vu et al. These can be found here: https://github.com/ntienvu/ICDM2017_FBO and here: https://github.com/ntienvu/ICDM2016_B3O
 
 ## Example code
 A quick example of the code is shown in example.py. This shows the optimization of the two peak Gaussian mixture discussed in the paper.
 
-## Useage
+## Usage
 IMPORTANT: The pickle_location variable in bayesianOptimizationMaster.py must be changed to the location of your pickleStorage file for this code to run
 
 The file bayesianOptimizationMaster.py controls the rest of the code It is set up to run a basic 2D Gaussian mixture but instructions running other functions and altering other parameters are given as comments in the code between rows of hash symbols.
