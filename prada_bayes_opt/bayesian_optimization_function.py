@@ -181,7 +181,7 @@ class PradaBayOptFn(object):
         
         # xt_suggestion, caching for Consensus
         self.xstars=[]
-        self.ystars=np.zeros((6,1))
+        self.ystars=np.zeros((2,1))
         
         # theta vector for marginalization GP
         self.theta_vector =[]
@@ -468,7 +468,7 @@ class PradaBayOptFn(object):
         
         y_max=np.max(self.Y)
 ###############################################################################        
-        # This controls the number of thompson samples, given a M in the paper
+# numXtar controls the number of thompson samples, given as M in the paper
 ###############################################################################
         numXtar=100
         
@@ -495,7 +495,8 @@ class PradaBayOptFn(object):
             
         if self.xstars==[]:
             self.xstars=temp
-        y_stars=np.array([np.mean(self.y_stars),np.std(self.y_stars),np.min(self.Y),np.max(self.Y),np.min(self.Y_original),np.max(self.Y_original)]).reshape(6,-1)
+        #save optimal Thompson sample mean and sdv for later analysis
+        y_stars=np.array([np.mean(self.y_stars),np.std(self.y_stars)]).reshape(2,-1)
         self.acq['xstars']=self.xstars   
         self.acq['ystars']=self.y_stars   
         self.ystars=np.hstack((self.ystars,(np.array(y_stars))))

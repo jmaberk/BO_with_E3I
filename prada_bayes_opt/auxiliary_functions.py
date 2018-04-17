@@ -48,10 +48,8 @@ def run_experiment(bo,gp_params,yoptimal=0,n_init=3,NN=10):
     start_time = time.time()
     bo.init(gp_params,n_init_points=n_init)
     
-    # number of recommended parameters
-    for index in range(0,NN-1):
-        #print index
-        
+    # Main BO loop. Finds the next optimal point
+    for index in range(0,NN-1):        
         if bo.acq['name']=='e3i':
             bo.maximize_ei_dist(gp_params)
         else:
@@ -65,7 +63,8 @@ def run_experiment(bo,gp_params,yoptimal=0,n_init=3,NN=10):
             
 def yBest_Iteration(YY,BatchSzArray,IsPradaBO=0,Y_optimal=0,step=3):
     """
-    Used for finding the
+    Used for finding the optimal y value at each iteration from the pickle
+    files. Done so results can be printed.
 
     Input parameters
     ----------

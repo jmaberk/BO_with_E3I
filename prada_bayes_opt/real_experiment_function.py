@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 02 21:24:47 2016
+Name: real_experiment_functions.py
+Authors: Julian Berk and Vu Nguyen
+Publication date:16/04/2018
+Description: These classes run real-world experiments that can be used to test
+our acquisition functions
 
-@author: tvun
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 19 11:25:02 2016
-
-@author: Vu
+###############################IMPORTANT#######################################
+The classes here all have file paths that need to be set correctlt for them to
+work. Please make sure you change all paths before using a class
 """
 
 import numpy as np
@@ -154,7 +153,7 @@ class SVR_function:
         
     def func(self,X):
         X=np.asarray(X)
-            
+        ##########################CHANGE PATH##################################    
         Xdata, ydata = self.get_data("D:\\OneDrive\\Documents\\PhD\Code\\Bayesian\\PradaBayesianOptimization\\real_experiment\\space_ga_scale")
         nTrain=np.int(0.7*len(ydata))
         X_train, y_train = Xdata[:nTrain], ydata[:nTrain]
@@ -222,6 +221,7 @@ class AlloyCooking_Profiling:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\Alloy_Paul\parameters_fitting',nargout=0)
         
         #mycooktemp=matlab.double(np.array([x3,x4]))
@@ -308,6 +308,7 @@ class AlloyCooking_Profiling_3Steps:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\KWN_Heat_Treatment',nargout=0)
         
         #mycooktemp=matlab.double(np.array([x3,x4]))
@@ -391,6 +392,7 @@ class AlloyCooking_Profiling2:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\Alloy_Paul\parameters_fitting',nargout=0)
         
         #mycooktemp=matlab.double(np.array([x3,x4]))
@@ -455,6 +457,7 @@ class AlloyKWN_Fitting:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'P:\02.Sharing\Vu_Sunil_Santu\Alloy_Paul\parameters_fitting',nargout=0)
         eng.addpath(r'P:\02.Sharing\Vu_Sunil_Santu\Alloy_Paul\parameters_fitting\data',nargout=0)
         eng.addpath(r'P:\02.Sharing\Vu_Sunil_Santu\Alloy_Paul\parameters_fitting\BO-matlab-code',nargout=0)
@@ -514,6 +517,7 @@ class VPSC7_Fitting:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\vu_code',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\Wang2010A',nargout=0)
@@ -569,6 +573,7 @@ class VPSC7_Fitting_9Variables:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\vu_code',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\Wang2010A',nargout=0)
@@ -616,6 +621,7 @@ class VPSC7_Fitting_Line46_Thres1:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\vu_code',nargout=0)
         eng.addpath(r'F:\Dropbox\05.WithSanSunSvetha\Vu_Sunil_Santu\cp_parameteroptimization\VPSC7b\Wang2010A',nargout=0)
@@ -900,6 +906,7 @@ class Robot_BipedWalker:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\WGCCM_three_link_walker_example\WGCCM_three_link_walker_example',nargout=0)
 
         temp=matlab.double(X.tolist())
@@ -1103,7 +1110,7 @@ class BayesNonMultilabelClassification:
         """
     def run_BNMC(self,X):
         #print X
-        
+        ##########################CHANGE PATH##################################
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC\utilities',nargout=0)
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC\data',nargout=0)
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC',nargout=0)
@@ -1169,7 +1176,7 @@ class BayesNonMultilabelClassificationEnron:
         """
     def run_BNMC(self,X):
         #print X
-        
+        ##########################CHANGE PATH##################################
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC\utilities',nargout=0)
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC\data',nargout=0)
         eng.addpath(r'D:\OneDrive\Documents\PhD\Code\Bayesian\PradaBayesianOptimization\real_experiment\BNMC',nargout=0)
@@ -1224,6 +1231,7 @@ class Alloy_2050_NotSC:
         import matlab.engine
         import matlab
         eng = matlab.engine.start_matlab()
+        ##########################CHANGE PATH##################################
         eng.addpath(r'C:\Users\santurana\Projects\Vu_Experiment',nargout=0)
         eng.addpath(r'C:\Users\santurana\Projects\Matlab-R2015b\toolbox',nargout=0)
 

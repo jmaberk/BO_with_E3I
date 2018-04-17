@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 19 11:25:02 2016
-
-@author: Vu
-"""
+'''
+Name: functions.py
+Authors: Julian Berk and Vu Nguyen
+Publication date:16/04/2018
+Description: A range of benchmark and synthetic funtions to optimize with 
+Bayesian optimization
+'''
 
 import numpy as np
 from collections import OrderedDict
@@ -23,41 +24,17 @@ def reshape(x,input_dim):
     return x
     
 class functions:
-    def plot(self):
-        
-		bounds=self.bounds
-		if isinstance(bounds,dict):
-			# Get the name of the parameters
-			keys = bounds.keys()
-			arr_bounds = []
-			for key in keys:
-				arr_bounds.append(bounds[key])
-				arr_bounds = np.asarray(arr_bounds)
-		else:
-			arr_bounds=np.asarray(bounds)
-		X=np.array([np.arange(x[0], x[1], 0.01) for x in arr_bounds])
-		X=X.reshape(-1,2)
-		X1=np.array([X[:,0]])
-		X2=np.array([X[:,1]])
-		X1, X2 = np.meshgrid(X1, X2)
-		y=np.zeros([X1.shape[1],X2.shape[1]])
-		#print(y.shape)
-		#print(X1.shape)
-		#print(X2.shape)
-		for ii in range(0,X1.shape[1]):
-			for jj in range(0,X2.shape[1]):
-				#print(ii,jj)
-				Xij=np.array([X1[ii,ii],X2[jj,jj]])
-				#print(Xij)
-				y[ii,jj]=self.func(Xij)
-#		f1=plt.figure(1)
-#		ax=plt.axes(projection='3d')
-#		ax.plot_surface(X1,X2,y)
-		plt.contourf(X1,X2,y,levels=np.arange(0,35,1))
-		plt.colorbar()
 		
     def findExtrema(self):
+        """
+        Description: Estimates and prints the maxima and minima of a function 
+        though brute force evaluation. Used for method evaluation. 
+        Useage: Mucst be called from a function in the form 
+        random_function.findExtrema().
+        Output: Prints out the maxiam and minima of the desired function.
+        """
         step_size=0.01
+        #determine function bounds
         bounds=self.bounds
         if isinstance(bounds,dict):
             # Get the name of the parameters
@@ -68,8 +45,10 @@ class functions:
             arr_bounds = np.asarray(arr_bounds)
         else:
             arr_bounds=np.asarray(bounds)
+        #randomly generate points and evaluate them
         X=np.array([np.arange(x[0], x[1], step_size) for x in arr_bounds])
         y=self.func(X.T)
+        #find optima
         functionMax=np.max(y)
         functionMin=np.min(y)
         print("function max={}".format(functionMax))
@@ -77,7 +56,16 @@ class functions:
         return (functionMin,functionMax)
         
     def findSdev(self):
+        """
+        Description: Estimates the standard deviation of the function through
+        multiple evaluations. Used to generate noise with appropriate
+        magnitudes
+        Useage: Mucst be called from a function in the form 
+        random_function.findSdev().
+        Output: An estimate of the functions standard deviation, sdv
+        """
         num_points_per_dim=100
+        #determine function bounds
         bounds=self.bounds
         if isinstance(bounds,dict):
             # Get the name of the parameters
@@ -88,15 +76,21 @@ class functions:
             arr_bounds = np.asarray(arr_bounds)
         else:
             arr_bounds=np.asarray(bounds)
+        #randomly generate points and evaluate them
         X=np.array([np.random.uniform(x[0], x[1], size=num_points_per_dim) for x in arr_bounds])
         X=X.reshape(num_points_per_dim,-1)
         y=self.func(X)
+        #calculate standard deviation
         sdv=np.std(y)
-        #maxima=np.max(y)
-        #minima=np.min(y)
         return sdv
     
 class saddlepoint(functions):
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=saddlepoint() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: The function value at x
+    """
     def __init__(self):
         self.input_dim=2
         self.bounds=OrderedDict({'x1':(-1,1),'x2':(-1,1)})
@@ -111,27 +105,17 @@ class saddlepoint(functions):
         fval=X[:,0]*X[:,0]-X[:,1]*X[:,1]
         return fval*self.ismax
         
-class sin(functions):
-    def __init__(self):
-        self.input_dim=1
-        self.bounds={'x':(-1,15)}
-        #self.bounds={'x':(0,1)}
-
-        self.fmin=11
-        self.min=0
-        self.ismax=1
-        self.name='sincos'
-    def func(self,x):
-        x=np.asarray(x)
-
-        fval=np.sin(x)
-        return fval*self.ismax
         
 class sincos(functions):
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=sincos() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: The function value at x
+    """
     def __init__(self):
         self.input_dim=1
         self.bounds={'x':(-1,2)}
-        #self.bounds={'x':(0,1)}
 
         self.fmin=11
         self.min=0
@@ -144,15 +128,15 @@ class sincos(functions):
         return fval*self.ismax
 
 class fourier(functions):
-	'''
-	Forrester function. 
-	
-	:param sd: standard deviation, to generate noisy evaluations of the function.
-	'''
+        """
+        Description: Function for BO method evaluation
+        Useage: must be initiated with a f=fourier() call. It can then be
+        evaluated with f.func(x) for the input x.
+        Output: The function value at x
+        """
+
 	def __init__(self,sd=None):
 		self.input_dim = 1		
-		#if sd==None: self.sd = 0
-		#else: self.sd=sd
 		self.sd=self.findSdev()
 		self.min = 4.795 		## approx
 		self.fmin = -9.5083483926941064 			## approx
@@ -164,14 +148,26 @@ class fourier(functions):
 		X = X.reshape((len(X),1))
 		n = X.shape[0]
 		fval = X*np.sin(X)+X*np.cos(2*X)
-		if self.sd ==0:
-			noise = np.zeros(n).reshape(n,1)
-		else:
-			noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
-		return self.ismax*fval.reshape(n,1) + noise
+		fval=self.ismax*fval.reshape(n,1)
+###############################################################################        
+#       #Generates noise. Comment out between the hash lines to run in the
+#       #noiseless case
+#		if self.sd ==0:
+#			noise = np.zeros(n).reshape(n,1)
+#		else:
+#			noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
+#		fval=fval+noise
+###############################################################################            
+		return fval
         
         
 class branin(functions):
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=fourier() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: The function value at x
+    """
     def __init__(self,sd=None):
 		self.input_dim=2
 		#if sd==None: self.sd = 0
@@ -203,17 +199,24 @@ class branin(functions):
         fx=a*(x2-b*x1*x1+c*x1-r)**2+s*(1-t)*np.cos(x1)+s    
         
         n=X.shape[0]
-        noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        fval=fx*self.ismax
+###############################################################################        
+#       #Generates noise. Comment out between the hash lines to run in the
+#       #noiseless case
+#        noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+#        fval=fval+np.ravel(noise)
+###############################################################################
             
-            
-        return fx*self.ismax+np.ravel(noise)
+        return fval
         
     
 class forrester(functions):
-	'''
-	Forrester function. 
-	:param sd: standard deviation, to generate noisy evaluations of the function.
-	'''
+	"""
+	Description: Function for BO method evaluation
+	Useage: must be initiated with a f=fourier() call. It can then be
+	evaluated with f.func(x) for the input x.
+	Output: The function value at x
+	"""
 	def __init__(self):
 		self.input_dim = 1		
 		self.min = 0.78 		## approx
@@ -232,12 +235,12 @@ class forrester(functions):
 
   
 class rosenbrock(functions):
-	'''
-	rosenbrock function
-
-	:param bounds: the box constraints to define the domain in which the function is optimized.
-	:param sd: standard deviation, to generate noisy evaluations of the function.
-	'''
+	"""
+	Description: Function for BO method evaluation
+	Useage: must be initiated with a f=rosenbrock() call. It can then be
+	evaluated with f.func(x) for the input x.
+	Output: fval, the function value at x
+	"""
 	def __init__(self,bounds=None):
 		self.input_dim = 2
 		if bounds == None: self.bounds = OrderedDict([('x1',(-0.5,3)),('x2',(-1.5,2))])
@@ -264,18 +267,24 @@ class rosenbrock(functions):
 			n=X.shape[0]
 
 		fx = 100*(x2-x1**2)**2 + (x1-1)**2
-		noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
-		return fx*self.ismax#+np.ravel(noise)
+		fval=fx*self.ismax
+###############################################################################        
+#       #generates noise. comment out between the hash lines to run in the
+#       #noiseless case
+#		noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
+#		fval=fval+np.ravel(noise)
+###############################################################################
+		return fval
     
 
 
 class beale(functions):
-    '''
-    beale function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=beale() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = OrderedDict({'x1':(-1,1),'x2':(-1,1)})
@@ -299,18 +308,24 @@ class beale(functions):
             x1=X[:,0]
             x2=X[:,1]	
         fval = (1.5-x1+x1*x2)**2+(2.25-x1+x1*x2**2)**2+(2.625-x1+x1*x2**3)**2
-        noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
-        return self.ismax*fval+np.ravel(noise)   
+        fval=self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################
+        return fval 
 			
 
 
 class dropwave(functions):
-    '''
-    dropwave function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=dropwave() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = OrderedDict([('x1',(-5.12,5.12)),('x2',(-5.12,5.12))])
@@ -320,8 +335,6 @@ class dropwave(functions):
         self.ismax=1
         self.name = 'dropwave'
         self.sd=0
-		 #if sd==None: self.sd = 0
-		 #else: self.sd=sd
         self.sd=self.findSdev()
 		
     def func(self,X):
@@ -334,19 +347,24 @@ class dropwave(functions):
         else:
             x1=X[:,0]
             x2=X[:,1]
-        
         fval = - (1+np.cos(12*np.sqrt(x1**2+x2**2))) / (0.5*(x1**2+x2**2)+2) 
-        noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        return self.ismax*fval+np.ravel(noise)
+        fval=self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################
+        return fval
 
 
 class cosines(functions):
-    '''
-    Cosines function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=cosines() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = OrderedDict([('x1',(0,1)),('x2',(0,1))])
@@ -375,18 +393,24 @@ class cosines(functions):
         u = 1.6*x1-0.5
         v = 1.6*x2-0.5
         fval = 1-(u**2 + v**2 - 0.3*np.cos(3*np.pi*u) - 0.3*np.cos(3*np.pi*v) )
-
-        return self.ismax*fval
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################
+        return fval
             
             
             
 class goldstein(functions):
-    '''
-    Goldstein function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=goldstein() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = {'x1':(-2,2),'x2':(-2,2)}
@@ -416,18 +440,24 @@ class goldstein(functions):
         fact2b = 18 - 32*x1 + 12*x1**2 + 48*x2 - 36*x1*x2 + 27*x2**2
         fact2 = 30 + fact2a*fact2b
         fval = fact1*fact2
-
-        return self.ismax*fval
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################
+        return fval
 
 
 
 class sixhumpcamel(functions):
-    '''
-    Six hump camel function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=sixhumpcamel() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = OrderedDict([('x1',(-2,2)),('x2',(-1,1))])
@@ -455,19 +485,24 @@ class sixhumpcamel(functions):
         term2 = x1*x2
         term3 = (-4+4*x2**2) * x2**2
         fval = term1 + term2 + term3
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
-        
-        return self.ismax*fval+np.ravel(noise)
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################        
+        return fval
 
 
 
 class mccormick(functions):
-    '''
-    Mccormick function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=mccormick() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = [(-1.5,4),(-3,4)]
@@ -489,16 +524,23 @@ class mccormick(functions):
         term3 = -1.5*x1
         term4 = 2.5*x2
         fval = term1 + term2 + term3 + term4 + 1
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################  
         return self.ismax*fval
 
 
 class powers(functions):
-    '''
-    Powers function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=powers() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None,sd=None):
         self.input_dim = 2
         if bounds == None: self.bounds = [(-1,1),(-1,1)]
@@ -519,13 +561,22 @@ class powers(functions):
             x1 = x[:,0]
             x2 = x[:,1]
             fval = abs(x1)**2 + abs(x2)**3
-            if self.sd ==0:
-                noise = np.zeros(n).reshape(n,1)
-            else:
-                noise = np.random.normal(0,self.sd,n).reshape(n,1)
-            return fval.reshape(n,1) + noise
+            fval = fval.reshape(n,1)
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################  
+            return fval
 
 class eggholder(functions):
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=goldstein() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None):
         self.input_dim = 2
         #self.bounds = {'x1':(-512,512),'x2':(-512,512)}
@@ -548,17 +599,23 @@ class eggholder(functions):
         x1=X[:,0]
         x2=X[:,1]
         fval = -(x2+47) * np.sin(np.sqrt(abs(x2+x1/2+47))) + -x1 * np.sin(np.sqrt(abs(x1-(x2+47))))
+        fval = self.ismax*fval
         n=1
-        noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        return self.ismax*fval+np.ravel(noise)
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################  
+        return fval
 
 class alpine1(functions):
-    '''
-    Alpine1 function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=alpine1() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
 
     def __init__(self,input_dim, bounds=None, sd=None):
         if bounds == None: 
@@ -587,17 +644,23 @@ class alpine1(functions):
         else:
             fval = np.sum(temp,axis=1)
         n=1
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)        
-        return self.ismax*fval+np.ravel(noise)
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################         
+        return fval
 
 
 class alpine2(functions):
-    '''
-    Alpine2 function
-    
-    :param bounds: the box constraints to define the domain in which the function is optimized.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=alpine2() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,input_dim, bounds=None, sd=None):
         if bounds == None: 
             self.bounds = bounds  =[(1,10)]*input_dim
@@ -623,21 +686,23 @@ class alpine2(functions):
         
         X = reshape(X,self.input_dim)
         n=1
-        #n = X.shape[0]
-        #fval = np.cumprod(np.sqrt(X),axis=1)[:,self.input_dim-1]*np.cumprod(np.sin(X),axis=1)[:,self.input_dim-1]  
-        #fval = np.cumprod(np.sqrt(X))[:,self.input_dim-1]*np.cumprod(np.sin(X))[:,self.input_dim-1]
         fval=[self.ismax*self.internal_func(val) for idx, val in enumerate(X)]
-        n=1
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)  
-        return np.asarray(fval)+noise
+        fval=np.asarray(fval)
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################    
+        return fval
 
 class gSobol:
-    '''
-    gSolbol function
-   
-    :param a: one-dimensional array containing the coefficients of the function.
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=gSobol() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,a,bounds=None,sd=None):
         self.a = a
         self.input_dim = len(self.a)
@@ -661,16 +726,23 @@ class gSobol:
         n = X.shape[0]
         aux = (abs(4*X-2)+np.ones(n).reshape(n,1)*self.a)/(1+np.ones(n).reshape(n,1)*self.a)
         fval =  np.cumprod(aux,axis=1)[:,self.input_dim-1]
-
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################    
         return self.ismax*fval
 
 #####
 class ackley(functions):
-    '''
-    Ackley function 
-
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=ackley() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self, input_dim, bounds=None):
         self.input_dim = input_dim
 
@@ -689,21 +761,26 @@ class ackley(functions):
     def func(self,X):
         n=1
         X = reshape(X,self.input_dim)
-        #print X
-        #n = X.shape[0]
         fval = (20+np.exp(1)-20*np.exp(-0.2*np.sqrt((X**2).sum(1)/self.input_dim))-np.exp(np.cos(2*np.pi*X).sum(1)/self.input_dim))
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
+        fval = self.ismax*fval
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+############################################################################### 
       
-        return self.ismax*fval+noise
+        return fval
 
 
 #####
 class hartman_6d(functions):
-    '''
-    Ackley function 
-
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=hartman_6d() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,  bounds=None,sd=None):
         self.input_dim = 6
 
@@ -758,21 +835,27 @@ class hartman_6d(functions):
                 outer = outer + new
 
             fval[idx] = -(2.58 + outer) / 1.94;
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
+            noise=0
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+############################################################################### 
       
         if n==1:
-            return self.ismax*(fval[0][0])
+            return self.ismax*(fval[0][0])+noise
         else:
             return self.ismax*(fval)+noise
         
         
 #####
 class hartman_4d:
-    '''
-    Ackley function 
-
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=hartman_4d() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,  bounds=None,sd=None):
         self.input_dim = 4
 
@@ -824,19 +907,26 @@ class hartman_4d:
                 new = alpha[ii] * np.exp(-inner)
                 outer = outer + new
             fval[idx] = (1.1 - outer) / 0.839;
+        noise=0
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+############################################################################### 
         if n==1:
-            return self.ismax*(fval[0][0])
+            return self.ismax*(fval[0][0])+noise
         else:
-            return self.ismax*(fval)
+            return self.ismax*(fval)+noise
             
             
             
 class hartman_3d(functions):
-    '''
-    hartman_3d: function 
-
-    :param sd: standard deviation, to generate noisy evaluations of the function.
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=hartman_4d() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,  bounds=None):
         self.input_dim = 3
         self.sd=0
@@ -890,64 +980,27 @@ class hartman_3d(functions):
                 outer = outer + new
 
             fval[idx] = -outer;
-        
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
+        noise=0
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+############################################################################### 
         if n==1:
             return self.ismax*(fval[0][0])+noise
         else:
             return self.ismax*(fval)+noise
-		
-class mixture(functions):
-	'''
-	a scalable gaussian mixture function
-	
-	:param sd: standard deviation to generate noisy exaluations of the functions
-	:param peaks: number of gaussian peaks used
-	'''
-	def __init__(self,bounds=None, peaks=3):
-		self.input_dim=2
-		self.peaks=peaks
-		self.sd=0
-		if bounds == None:
-			self.bounds =[(0,1)]*self.input_dim
-		else:
-			self.bounds = bounds
-		self.min = [(0.)*self.input_dim]
-		self.fmin=-1
-		self.ismax=-1
-		self.name="mixture"
-		self.sd=self.findSdev()
-		
-	def func(self,X):
-		X = reshape(X,self.input_dim)
-		n = X.shape[0]
-		y=2*multivariate_normal.pdf(X,mean=[0.5,0.5],cov=0.07*np.eye(2))
-		if self.peaks>=2:
-			y+=1.8*multivariate_normal.pdf(X,mean=[0.2,0.2],cov=0.03*np.eye(2))
-		if self.peaks>=3:
-			y+=1.7*multivariate_normal.pdf(X,mean=[0.7,0.7],cov=0.07*np.eye(2))
-		if self.peaks>=4:
-			y+=1*multivariate_normal.pdf(X,mean=[0.8,0.5],cov=0.02*np.eye(2))
-		if self.peaks>=5:
-			y+=1.7*multivariate_normal.pdf(X,mean=[0.4,0.6],cov=0.005*np.eye(2))
-		if self.peaks>=6:
-			y+=1.75*multivariate_normal.pdf(X,mean=[0.3,0.4],cov=0.0012*np.eye(2))
-		if self.peaks>=7:
-			y+=1.75*multivariate_normal.pdf(X,mean=[0.9,0.8],cov=0.01*np.eye(2))
-		if self.peaks>=8:
-			y+=1.75*multivariate_normal.pdf(X,mean=[0.2,0.6],cov=0.01*np.eye(2))
-		if self.peaks>=9:
-			y+=1.75*multivariate_normal.pdf(X,mean=[0.9,0.3],cov=0.01*np.eye(2))
-		return y
     
-class gaussian(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
-    def __init__(self,bounds=None, dim=3):
+class doubleGaussian(functions):
+    """
+    Description: The two peak Gaussian mixture function described in the paper. 
+    Used for BO method evaluation.
+    Useage: must be initiated with a f=doubleGaussian() call. It can then be
+    evaluated with f.func(x) for the input x. Optionally a dimension parameter,
+    d, can be added to the call, f=doubleGaussian(dim=d).
+    Output: fval, the function value at x
+    """
+    def __init__(self,bounds=None, dim=2):
         self.input_dim=dim
         self.sd=0
         if bounds == None:
@@ -957,56 +1010,33 @@ class gaussian(functions):
         self.min = [(0.)*self.input_dim]
         self.fmin=-1
         self.ismax=-1
-        self.name="gaussian"
-        self.sd=self.findSdev()
-    def func(self,X):
-        X = reshape(X,self.input_dim)
-        n = X.shape[0]
-        noise = np.random.normal(0,0.1*self.sd,n).reshape(n,1)
-        y=multivariate_normal.pdf(X,mean=0.5*np.ones(self.input_dim),cov=np.eye(self.input_dim))
-        return y
-    
-class doubleGaussian(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
-    def __init__(self,bounds=None, dim=3):
-        self.input_dim=dim
-        #self.sd=0
-        if bounds == None:
-            self.bounds =[(0,1)]*self.input_dim
-        else:
-            self.bounds = bounds
-        self.min = [(0.)*self.input_dim]
-        self.fmin=-1
-        self.ismax=-1
         self.name="doubleGaussian"
-        #self.sd=self.findSdev()
+        self.sd=self.findSdev()
         self.functionMin,self.functionMax=(0,0)
         self.functionMin,self.functionMax=self.findExtrema()
     def func(self,X):
         X = reshape(X,self.input_dim)
         n = X.shape[0]
-        #noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        amp=self.functionMax-self.functionMin
-        noise = np.random.normal(0,0.001*amp,n).reshape(n,1)
         y1=multivariate_normal.pdf(X,mean=0.7*np.ones(self.input_dim),cov=0.01*np.eye(self.input_dim))
         y2=multivariate_normal.pdf(X,mean=0.1*np.ones(self.input_dim),cov=0.001*np.eye(self.input_dim))
-        y=y1+y2
-        if amp>=0:
-            y=y+noise.T
-        return y
+        fval=y1+y2
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+############################################################################### 
+        return fval
     
 class schwefel(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
+    """
+    Description: Schwefel function described in the paper. 
+    Used for BO method evaluation.
+    Useage: must be initiated with a f=schwefel() call. It can then be
+    evaluated with f.func(x) for the input x. Optionally a dimension parameter,
+    d, can be added to the call, f=schwefel(dim=d)
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None, dim=3):
         self.input_dim=dim
         self.sd=0
@@ -1024,21 +1054,25 @@ class schwefel(functions):
         X=1000*X-500*np.ones(X.shape)
         X = reshape(X,self.input_dim)
         n = X.shape[0]
-        noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
         if self.input_dim>1:
-            y=418.9829*self.input_dim-np.sum(X*np.sin(np.sqrt(np.abs(X))),axis=1)
+            fval=418.9829*self.input_dim-np.sum(X*np.sin(np.sqrt(np.abs(X))),axis=1)
         else:
-            y=418.9829-X*np.sin(np.sqrt(np.abs(X)))
-        #y=y+noise.T
-        return y
+            fval=418.9829-X*np.sin(np.sqrt(np.abs(X)))
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+############################################################################### 
+        return fval
 
 class shubert(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
+    """
+    Description: Shubert function described in the paper. 
+    Used for BO method evaluation.
+    Useage: must be initiated with a f=schwefel() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None):
         self.input_dim=2
         #self.sd=0
@@ -1050,7 +1084,7 @@ class shubert(functions):
         self.fmin=-186.7309
         self.ismax=-1
         self.name="shubert"
-        #self.sd=self.findSdev()
+        self.sd=self.findSdev()
         self.functionMin,self.functionMax=(0,0)
         self.functionMin,self.functionMax=self.findExtrema()
     def func(self,X):
@@ -1058,26 +1092,27 @@ class shubert(functions):
         X=10.24*X-5.12*np.ones(X.shape)
         X = reshape(X,self.input_dim)
         n = X.shape[0]
-        #noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        amp=self.functionMax-self.functionMin
-        noise = np.random.normal(0,0.01*amp,n).reshape(n,1)
         y1=0
         y2=0
         for i in range(1,5):
             y1+=i*np.cos((i+1)*X[:,0]+i)
             y2+=i*np.cos((i+1)*X[:,1]+i)
-        y=y1+y2
-        if amp>=0:
-            y=y+noise.T
-        return y  
+        fval=y1+y2
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+############################################################################### 
+        return fval  
 
 class franke(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=franke() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None):
         self.input_dim=2
         #self.sd=0
@@ -1096,24 +1131,26 @@ class franke(functions):
         X=np.asarray(X)
         X = reshape(X,self.input_dim)
         n = X.shape[0]
-        #noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        amp=self.functionMax-self.functionMin
-        noise = np.random.normal(0,0.01*amp,n).reshape(n,1)
-        y=0.75*np.exp(-np.square(9*X[:,0]-2)/4-np.square(9*X[:,1]-2)/4)
-        y+=0.75*np.exp(-np.square(9*X[:,0]+1)/49-(9*X[:,1]+1)/10)
-        y+=0.75*np.exp(-np.square(9*X[:,0]-7)/4-np.square(9*X[:,1]-3)/4)
-        y-=0.2*np.exp(-np.square(9*X[:,0]-4)-np.square(9*X[:,1]-7))
-#        if amp>=0:
-#            y=y+noise.T
-        return y  
+        
+        fval=0.75*np.exp(-np.square(9*X[:,0]-2)/4-np.square(9*X[:,1]-2)/4)
+        fval+=0.75*np.exp(-np.square(9*X[:,0]+1)/49-(9*X[:,1]+1)/10)
+        fval+=0.75*np.exp(-np.square(9*X[:,0]-7)/4-np.square(9*X[:,1]-3)/4)
+        fval-=0.2*np.exp(-np.square(9*X[:,0]-4)-np.square(9*X[:,1]-7))
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+############################################################################### 
+        return fval 
 
 class griewank(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
+    """
+    Description: Function for BO method evaluation
+    Useage: must be initiated with a f=griewank() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None, dim=3):
         self.input_dim=dim
         #self.sd=0
@@ -1132,24 +1169,26 @@ class griewank(functions):
         X = reshape(X,self.input_dim)
         X=120*X-60*np.ones(X.shape)
         n = X.shape[0]
-        #noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        amp=self.functionMax-self.functionMin
-        noise = np.random.normal(0,0.001*amp,n).reshape(n,1)
         if self.input_dim>1:
-            y=np.sum(np.square(X)/4000,axis=1)-np.prod(np.cos(X/np.sqrt(np.arange(1,self.input_dim+1))),axis=1)+1
+            fval=np.sum(np.square(X)/4000,axis=1)-np.prod(np.cos(X/np.sqrt(np.arange(1,self.input_dim+1))),axis=1)+1
         else:
-            y=np.square(X)/4000-np.cos(X)+1
-#        if amp>=0:
-#            y=y+noise.T
-        return y
+            fval=np.square(X)/4000-np.cos(X)+1
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+############################################################################### 
+        return fval
     
 class levy(functions):
-    '''
-    a scalable gaussian mixture function
-    
-    :param sd: standard deviation to generate noisy exaluations of the functions
-    :param peaks: number of gaussian peaks used
-    '''
+    """
+    Description: Shubert function described in the paper. 
+    Used for BO method evaluation.
+    Useage: must be initiated with a f=schwefel() call. It can then be
+    evaluated with f.func(x) for the input x.
+    Output: fval, the function value at x
+    """
     def __init__(self,bounds=None, dim=3):
         self.input_dim=dim
         #self.sd=0
@@ -1168,21 +1207,22 @@ class levy(functions):
         X = reshape(X,self.input_dim)
         X=20*X-10*np.ones(X.shape)
         n = X.shape[0]
-        #noise = np.random.normal(0,0.01*self.sd,n).reshape(n,1)
-        amp=self.functionMax-self.functionMin
-        noise = np.random.normal(0,0.001*amp,n).reshape(n,1)
         if self.input_dim>1:
-            y=np.square(np.sin(math.pi*(1+(X[:,0]-1/4))))
+            fval=np.square(np.sin(math.pi*(1+(X[:,0]-1/4))))
             for d in range(0,self.input_dim-1):
                 w=1+(X[:,d]-1)/4
-                y+=np.square(w-1)*(1+10*np.square(np.sin(math.pi*w+1)))
+                fval+=np.square(w-1)*(1+10*np.square(np.sin(math.pi*w+1)))
             w=1+(X[:,(self.input_dim-1)]-1)/4
-            y+=np.square(w-1)*(1+np.square(np.sin(2*math.pi*w)))
+            fval+=np.square(w-1)*(1+np.square(np.sin(2*math.pi*w)))
         else:
-            y=np.square(np.sin(math.pi*(1+(X[:]-1/4))))
+            fval=np.square(np.sin(math.pi*(1+(X[:]-1/4))))
             w=1+(X[:]-1)/4
-            y+=np.square(w-1)*(1+10*np.square(np.sin(math.pi*w+1)))
-#        if amp>=0:
-#            y=y+noise.T
-        return y
+            fval+=np.square(w-1)*(1+10*np.square(np.sin(math.pi*w+1)))
+###############################################################################        
+        ##Generates noise. Comment out between the hash lines to run in the
+        ##noiseless case
+        #noise = np.random.normal(0,0.1*self.sd,1).reshape(1,1)
+        #fval=fval+np.ravel(noise)
+###############################################################################
+        return fval
     

@@ -1,5 +1,5 @@
 '''
-Name: example.py
+Name: print_two_peak_gaussian.py
 Authors: Julian Berk and Vu Nguyen
 Publication date:16/04/2018
 Inputs:None

@@ -4,7 +4,9 @@ Authors: Julian Berk and Vu Nguyen
 Publication date:16/04/2018
 Inputs:None
 Outputs: Pickle files and plots containing the results from experiments run
-Description: Will run a quick example of E3I and 
+Description: Will run a quick example of E3I on the two peak Gaussian mixture 
+shown in our paper. It will also print the 1D version of the function for
+illustrative purposes
 '''
 ###############################################################################
 import sys
@@ -46,7 +48,6 @@ acq_type_list.append(temp)
 
 temp={}
 temp['name']='ucb'
-temp['kappa']=2
 acq_type_list.append(temp)
 
 temp={}
@@ -72,7 +73,7 @@ lengthscale adjustement will be made
 '''
 ###############################################################################
 
-D=1 #1
+D=4 #1
 myfunction_list=[]
 myfunction_list.append(functions.doubleGaussian(dim=D))
 

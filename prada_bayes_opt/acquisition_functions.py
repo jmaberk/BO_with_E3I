@@ -130,13 +130,17 @@ class AcquisitionFunction(object):
 
     @staticmethod
     def _ucb(x, gp):
+        """
+        Calculates the GP-UCB acquisition function values
+        Inputs: gp: The Gaussian process, also contains all data
+                x:The point at which to evaluate the acquisition function 
+        Output: acq_value: The value of the aquisition function at point x
+        """
         mean, var = gp.predict(x, eval_MSE=True)
         var.flags['WRITEABLE']=True
-        #var=var.copy()
-        var[var<1e-10]=0
+        var[var<1e-10]=0 #prevents negative variances obtained through comp errors
         mean=np.atleast_2d(mean).T
         var=np.atleast_2d(var).T                
-        #return mean + kappa * np.sqrt(var)
         return mean + np.log(len(gp.Y)) * np.sqrt(var)
     @staticmethod
     def _ucb_pe(x, gp, kappa, maxlcb):
@@ -167,6 +171,13 @@ class AcquisitionFunction(object):
                 
     @staticmethod
     def _ei(x, gp, y_max):
+        """
+        Calculates the EI acquisition function values
+        Inputs: gp: The Gaussian process, also contains all data
+                y_max: The maxima of the found y values
+                x:The point at which to evaluate the acquisition function 
+        Output: acq_value: The value of the aquisition function at point x
+        """
         y_max=np.asscalar(y_max)
         mean, var = gp.predict(x, eval_MSE=True)
         var2 = np.maximum(var, 1e-8 + 0 * var)
@@ -178,6 +189,14 @@ class AcquisitionFunction(object):
     
     @staticmethod
     def _ei_zeta(x, gp, y_max, zeta):
+        """
+        Calculates the \zeta_EI acquisition function values
+        Inputs: gp: The Gaussian process, also contains all data
+                y_max: The maxima of the found y values
+                x:The point at which to evaluate the acquisition function 
+                zeta: The constant with which to boost the incumbent by
+        Output: acq_value: The value of the aquisition function at point x
+        """
         y_max=np.asscalar(y_max)+zeta
         mean, var = gp.predict(x, eval_MSE=True)
         var2 = np.maximum(var, 1e-8 + 0 * var)
@@ -253,10 +272,9 @@ class AcquisitionFunction(object):
             self.mean_theta_TS=np.linalg.solve(A,gx)
         #Calculates the thompson sample value at the point x    
         def __call__(self,x,gp):
-            #phi_x=np.sqrt(1.0/self.UU_dim)*np.hstack([np.sin(np.dot(x,self.UU)), np.cos(np.dot(x,self.UU))])
             phi_x=np.sqrt(2.0/self.WW_dim)*np.hstack([np.sin(np.dot(x,self.WW)+self.bias), np.cos(np.dot(x,self.WW)+self.bias)])
             
-            # compute the mean of TS
+            # compute the TS value
             gx=np.dot(phi_x,self.mean_theta_TS)    
             return gx    
     # for plot purpose

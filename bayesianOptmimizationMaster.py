@@ -95,7 +95,6 @@ acq_type_list.append(temp)
 
 temp={}
 temp['name']='ucb'
-temp['kappa']=2
 acq_type_list.append(temp)
 
 temp={}
