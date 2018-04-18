@@ -73,7 +73,7 @@ lengthscale adjustement will be made
 '''
 ###############################################################################
 
-D=4 #1
+D=2 #1
 myfunction_list=[]
 myfunction_list.append(functions.doubleGaussian(dim=D))
 
@@ -83,7 +83,7 @@ print("Seed of {} used".format(seed))
 for idx, (myfunction,acq_type,mybatch_type,) in enumerate(itertools.product(myfunction_list,acq_type_list,mybatch_type_list)):
     func=myfunction.func
     mybound=myfunction.bounds
-    #gp_params = {'theta':0.05,'noise_delta':0.001}
+
     yoptimal=myfunction.fmin*myfunction.ismax
     
     acq_type['dim']=myfunction.input_dim 
@@ -124,8 +124,6 @@ for idx, (myfunction,acq_type,mybatch_type,) in enumerate(itertools.product(myfu
         MyOptTime[ii]=baysOpt.time_opt
         ystars[ii]=baysOpt.ystars
         
-    #baysOpt.xt_suggestions=[]
-    #baysOpt.y
     Score={}
     Score["GAP"]=GAP
     Score["ybest"]=ybest

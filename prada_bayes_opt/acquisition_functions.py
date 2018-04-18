@@ -17,9 +17,6 @@ class AcquisitionFunction(object):
     """
 
     def __init__(self, acq):
-        """
-        If UCB is to be used, a constant kappa is needed.
-        """
         self.acq=acq
         acq_name=acq['name']
         

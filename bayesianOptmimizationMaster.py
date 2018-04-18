@@ -115,8 +115,7 @@ experiment will start with.
 #3 max_iterations controls the number of iterations of Bayesian optimization
 that will run on the function. This must be controlled with iteration_factor
 for compatability with the print function.
-#4 num_repeats controls the number of repeat experiments. Higher dimension 
-functions can be adjusted separately to avoid long runtimes.
+#4 num_repeats controls the number of repeat experiments.
 5# acq_params['optimize_gp'] If this is 1, then the lengthscale will be
 determined by maximum likelihood every 15 samples. If any other value, no
 lengthscale adjustement will be made
@@ -130,7 +129,6 @@ print("Seed of {} used".format(seed))
 for idx, (myfunction,acq_type,mybatch_type,) in enumerate(itertools.product(myfunction_list,acq_type_list,mybatch_type_list)):
     func=myfunction.func
     mybound=myfunction.bounds
-    #gp_params = {'theta':0.05,'noise_delta':0.001}
     yoptimal=myfunction.fmin*myfunction.ismax
     
     acq_type['dim']=myfunction.input_dim 
@@ -140,10 +138,8 @@ for idx, (myfunction,acq_type,mybatch_type,) in enumerate(itertools.product(myfu
     iteration_factor=20 #3
     max_iterations=iteration_factor*myfunction.input_dim 
     
-    if myfunction.input_dim>=5: #4
-        num_repeats=10
-    else:
-        num_repeats=10
+    num_repeats=10 #4
+
 
     GAP=[0]*num_repeats
     ybest=[0]*num_repeats
@@ -171,8 +167,6 @@ for idx, (myfunction,acq_type,mybatch_type,) in enumerate(itertools.product(myfu
         MyOptTime[ii]=baysOpt.time_opt
         ystars[ii]=baysOpt.ystars
         
-    #baysOpt.xt_suggestions=[]
-    #baysOpt.y
     Score={}
     Score["GAP"]=GAP
     Score["ybest"]=ybest
