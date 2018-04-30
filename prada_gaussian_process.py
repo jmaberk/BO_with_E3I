@@ -279,7 +279,7 @@ class PradaGaussianProcess(object):
             """
             # compute K
             ur = unique_rows(self.X)
-            dim=X.shape[0]
+            dim=X.shape[1]
             myX=self.X[ur]
             myY=self.Y[ur]
             D=np.hstack((myX,myY.reshape(-1,1)))
@@ -291,7 +291,7 @@ class PradaGaussianProcess(object):
                 Ytrain=D_train[:,dim]
                 Xtest=D_test[0:dim]
                 Ytest=D_test[dim]
-                gp_params= {'theta':lengthscale,'noise_delta':0.001}
+                gp_params= {'theta':lengthscale,'noise_delta':noise_delta}
                 gp=PradaGaussianProcess(gp_params)
                 gp.fit(Xtrain, Ytrain)
                 mu, sigma2 = gp.predict(Xtest, eval_MSE=True)
