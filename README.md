@@ -1,8 +1,8 @@
 # BO_with_E3I
 
-This code runs the Exploration Enhanced Expected Improvement acquisition functions against other common acquisition functions. The paper describing the algorithm has been submitted for review to the ECML 2018 conference.
+This code runs the Exploration Enhanced Expected Improvement acquisition functions against other common acquisition functions. The paper describing the algorithm has been presented at the ECML 2018 conference and puplished in the conference proceedings: (https://link.springer.com/chapter/10.1007/978-3-030-10928-8_37).
 
-NOTE: The code here is functional but actively being commented and updated to make it easier to understand and use.
+The authors can be reached by email at jmberk@deakin.edu.au
 
 
 ## System Requirements
